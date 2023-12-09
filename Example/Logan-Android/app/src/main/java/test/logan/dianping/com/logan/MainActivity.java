@@ -119,8 +119,8 @@ public class MainActivity extends Activity {
     }
 
     private void loganSend() {
-        SimpleDateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String d = dataFormat.format(new Date(System.currentTimeMillis()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String d = dateFormat.format(new Date(System.currentTimeMillis()));
         String[] temp = new String[1];
         temp[0] = d;
         String ip = mEditIp.getText().toString().trim();
@@ -153,8 +153,8 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         final String url = "https://openlogan.inf.test.sankuai.com/logan/upload.json";
-        SimpleDateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
-        final String date = dataFormat.format(new Date(System.currentTimeMillis()));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final String date = dateFormat.format(new Date(System.currentTimeMillis()));
         Logan.s(url, date, "1", "logan-test-unionid", "deviceId", buildVersion, appVersion, new SendLogCallback() {
             @Override
             public void onLogSendCompleted(int statusCode, byte[] data) {

@@ -26,25 +26,22 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 class LoganControlCenter {
 
-    private static LoganControlCenter sLoganControlCenter;
+    private static volatile LoganControlCenter sLoganControlCenter;
 
-    private ConcurrentLinkedQueue<LoganModel> mCacheLogQueue = new ConcurrentLinkedQueue<>();
-    private String mCachePath; // 缓存文件路径
-    private String mPath; //文件路径
-    private long mSaveTime; //存储时间
-    private long mMaxLogFile;//最大文件大小
-    private long mMinSDCard;
-    private long mMaxQueue; //最大队列数
-    private String mEncryptKey16;
-    private String mEncryptIv16;
+    private final ConcurrentLinkedQueue<LoganModel> mCacheLogQueue = new ConcurrentLinkedQueue<>();
+    private final String mCachePath; // 缓存文件路径
+    private final String mPath; //文件路径
+    private final long mSaveTime; //存储时间
+    private final long mMaxLogFile;//最大文件大小
+    private final long mMinSDCard;
+    private final long mMaxQueue; //最大队列数
+    private final String mEncryptKey16;
+    private final String mEncryptIv16;
     private LoganThread mLoganThread;
-    private SimpleDateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private LoganControlCenter(LoganConfig config) {
         if (!config.isValid()) {
@@ -92,14 +89,10 @@ class LoganControlCenter {
         WriteAction action = new WriteAction();
         String threadName = Thread.currentThread().getName();
         long threadLog = Thread.currentThread().getId();
-        boolean isMain = false;
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            isMain = true;
-        }
         action.log = log;
         action.localTime = System.currentTimeMillis();
         action.flag = flag;
-        action.isMainThread = isMain;
+        action.isMainThread = Looper.getMainLooper() == Looper.myLooper();
         action.threadId = threadLog;
         action.threadName = threadName;
         model.writeAction = action;
@@ -111,7 +104,7 @@ class LoganControlCenter {
         }
     }
 
-    void send(String dates[], SendLogRunnable runnable) {
+    void send(String[] dates, SendLogRunnable runnable) {
         if (TextUtils.isEmpty(mPath) || dates == null || dates.length == 0) {
             return;
         }
@@ -119,7 +112,7 @@ class LoganControlCenter {
             if (TextUtils.isEmpty(date)) {
                 continue;
             }
-            long time = getDateTime(date);
+            long time = Util.getDateTime(date);
             if (time > 0) {
                 LoganModel model = new LoganModel();
                 SendAction action = new SendAction();
@@ -151,13 +144,4 @@ class LoganControlCenter {
         return new File(mPath);
     }
 
-    private long getDateTime(String time) {
-        long tempTime = 0;
-        try {
-            tempTime = dataFormat.parse(time).getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return tempTime;
-    }
 }

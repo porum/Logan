@@ -1,6 +1,7 @@
 package test.logan.dianping.com.logan;
 
 import android.app.Application;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.dianping.logan.Logan;
@@ -18,16 +19,19 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initLogan();
-        Logan.w("MyApplication onCreate", 3);
-        Logan.w("MyApplication onCreate", 3);
-        Logan.w("MyApplication onCreate", 3);
+
+        long start = SystemClock.elapsedRealtime();
+        for (int i = 0; i < 10000; i++) {
+            Logan.w("MyApplication onCreate", 3);
+        }
+        Log.i(TAG, "cost: " + (SystemClock.elapsedRealtime() - start));
+        Logan.f();
     }
 
     private void initLogan() {
         LoganConfig config = new LoganConfig.Builder()
-                .setCachePath(getApplicationContext().getFilesDir().getAbsolutePath())
-                .setPath(getApplicationContext().getExternalFilesDir(null).getAbsolutePath()
-                        + File.separator + FILE_NAME)
+                .setCachePath(getFilesDir().getAbsolutePath())
+                .setPath(getExternalFilesDir(null).getAbsolutePath() + File.separator + FILE_NAME)
                 .setEncryptKey16("0123456789012345".getBytes())
                 .setEncryptIV16("0123456789012345".getBytes())
                 .build();

@@ -37,7 +37,7 @@ JNIEXPORT jint JNICALL
 Java_com_dianping_logan_CLoganProtocol_clogan_1write(JNIEnv *env, jobject instance,
                                                           jint flag, jstring log_,
                                                           jlong local_time, jstring thread_name_,
-                                                          jlong thread_id, jint ismain);
+                                                          jlong thread_id, jint is_main);
 /**
  * JNI init interface
  */

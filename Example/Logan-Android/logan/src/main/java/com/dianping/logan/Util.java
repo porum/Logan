@@ -22,6 +22,7 @@
 
 package com.dianping.logan;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -36,6 +37,16 @@ public class Util {
             String dataStr = sDateFormat.format(new Date(currentTime));
             tempTime = sDateFormat.parse(dataStr).getTime();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempTime;
+    }
+
+    public static long getDateTime(String time) {
+        long tempTime = 0;
+        try {
+            tempTime = sDateFormat.parse(time).getTime();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         return tempTime;

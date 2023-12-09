@@ -50,7 +50,7 @@ public class ConstantCode {
         public static final int CLOGAN_WRITE_FAIL_HEADER = -4050; //写入头失败
         public static final int CLOGAN_WRITE_FAIL_JNI = -4060; //jni找不到对应C函数
 
-        public static final String CLOGAN_LOAD_SO = "logan_loadso"; //Logan装载So;
-        public static final int CLOGAN_LOAD_SO_FAIL = -5020; //加载的SO失败
+        public static final String CLOGAN_LOAD_SO = "logan_loadso"; //Logan装载so
+        public static final int CLOGAN_LOAD_SO_FAIL = -5020; //加载的so失败
     }
 }

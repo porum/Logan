@@ -28,13 +28,11 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 class LoganThread extends Thread {
 
@@ -53,17 +51,17 @@ class LoganThread extends Thread {
     private boolean mIsSDCard;
     private long mLastTime;
     private LoganProtocol mLoganProtocol;
-    private ConcurrentLinkedQueue<LoganModel> mCacheLogQueue;
-    private String mCachePath; // 缓存文件路径
-    private String mPath; //文件路径
-    private long mSaveTime; //存储时间
-    private long mMaxLogFile;//最大文件大小
-    private long mMinSDCard;
-    private String mEncryptKey16;
-    private String mEncryptIv16;
+    private final ConcurrentLinkedQueue<LoganModel> mCacheLogQueue;
+    private final String mCachePath; // 缓存文件路径
+    private final String mPath; //文件路径
+    private final long mSaveTime; //存储时间
+    private final long mMaxLogFile;//最大文件大小
+    private final long mMinSDCard;
+    private final String mEncryptKey16;
+    private final String mEncryptIv16;
     private int mSendLogStatusCode;
     // 发送缓存队列
-    private ConcurrentLinkedQueue<LoganModel> mCacheSendQueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<LoganModel> mCacheSendQueue = new ConcurrentLinkedQueue<>();
     private ExecutorService mSingleThreadExecutor;
 
     LoganThread(
@@ -126,12 +124,7 @@ class LoganThread extends Thread {
         }
         if (mLoganProtocol == null) {
             mLoganProtocol = LoganProtocol.newInstance();
-            mLoganProtocol.setOnLoganProtocolStatus(new OnLoganProtocolStatus() {
-                @Override
-                public void loganProtocolStatus(String cmd, int code) {
-                    Logan.onListenerLogWriteStatus(cmd, code);
-                }
-            });
+            mLoganProtocol.setOnLoganProtocolStatus(Logan::onListenerLogWriteStatus);
             mLoganProtocol.logan_init(mCachePath, mPath, (int) mMaxLogFile, mEncryptKey16,
                     mEncryptIv16);
             mLoganProtocol.logan_debug(Logan.sDebug);
@@ -181,7 +174,7 @@ class LoganThread extends Thread {
                         }
                         String[] longStrArray = item.split("\\.");
                         if (longStrArray.length > 0) {  //小于时间就删除
-                            long longItem = Long.valueOf(longStrArray[0]);
+                            long longItem = Long.parseLong(longStrArray[0]);
                             if (longItem <= deleteTime && longStrArray.length == 1) {
                                 new File(mPath, item).delete(); //删除文件
                             }
@@ -239,36 +232,29 @@ class LoganThread extends Thread {
             return;
         }
         action.sendLogRunnable.setSendAction(action);
-        action.sendLogRunnable.setCallBackListener(
-                new SendLogRunnable.OnSendLogCallBackListener() {
-                    @Override
-                    public void onCallBack(int statusCode) {
-                        synchronized (sendSync) {
-                            mSendLogStatusCode = statusCode;
-                            if (statusCode == SendLogRunnable.FINISH) {
-                                mCacheLogQueue.addAll(mCacheSendQueue);
-                                mCacheSendQueue.clear();
-                                notifyRun();
-                            }
-                        }
-                    }
-                });
+        action.sendLogRunnable.setCallBackListener(statusCode -> {
+            synchronized (sendSync) {
+                mSendLogStatusCode = statusCode;
+                if (statusCode == SendLogRunnable.FINISH) {
+                    mCacheLogQueue.addAll(mCacheSendQueue);
+                    mCacheSendQueue.clear();
+                    notifyRun();
+                }
+            }
+        });
         mSendLogStatusCode = SendLogRunnable.SENDING;
         if (mSingleThreadExecutor == null) {
-            mSingleThreadExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                @Override
-                public Thread newThread(Runnable r) {
-                    // Just rename Thread
-                    Thread t = new Thread(Thread.currentThread().getThreadGroup(), r,
-                            "logan-thread-send-log", 0);
-                    if (t.isDaemon()) {
-                        t.setDaemon(false);
-                    }
-                    if (t.getPriority() != Thread.NORM_PRIORITY) {
-                        t.setPriority(Thread.NORM_PRIORITY);
-                    }
-                    return t;
+            mSingleThreadExecutor = Executors.newSingleThreadExecutor(runnable -> {
+                // Just rename Thread
+                Thread t = new Thread(Thread.currentThread().getThreadGroup(), runnable,
+                        "logan-thread-send-log", 0);
+                if (t.isDaemon()) {
+                    t.setDaemon(false);
                 }
+                if (t.getPriority() != Thread.NORM_PRIORITY) {
+                    t.setPriority(Thread.NORM_PRIORITY);
+                }
+                return t;
             });
         }
         mSingleThreadExecutor.execute(action.sendLogRunnable);
@@ -305,8 +291,8 @@ class LoganThread extends Thread {
         FileInputStream inputStream = null;
         FileOutputStream outputStream = null;
         try {
-            inputStream = new FileInputStream(new File(src));
-            outputStream = new FileOutputStream(new File(des));
+            inputStream = new FileInputStream(src);
+            outputStream = new FileOutputStream(des);
             byte[] buffer = new byte[CACHE_SIZE];
             int i;
             while ((i = inputStream.read(buffer)) >= 0) {
@@ -314,8 +300,6 @@ class LoganThread extends Thread {
                 outputStream.flush();
             }
             back = true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

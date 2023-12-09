@@ -83,9 +83,7 @@ public class RealSendLogRunnable extends SendLogRunnable {
             FileInputStream fileStream = new FileInputStream(logFile);
             byte[] backData = doPostRequest(mUploadLogUrl, fileStream, getActionHeader());
             isSuccess = handleSendLogBackData(backData);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (FileNotFoundException | JSONException e) {
             e.printStackTrace();
         }
         return isSuccess;
@@ -133,10 +131,6 @@ public class RealSendLogRunnable extends SendLogRunnable {
                 }
                 data = back.toByteArray();
             }
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

@@ -32,16 +32,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 
 public class SendLogDefaultRunnable extends SendLogRunnable {
 
@@ -119,12 +115,7 @@ public class SendLogDefaultRunnable extends SendLogRunnable {
             URL u = new URL(url);
             c = (HttpURLConnection) u.openConnection();
             if (c instanceof HttpsURLConnection) {
-                ((HttpsURLConnection) c).setHostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-                        return true;
-                    }
-                });
+                ((HttpsURLConnection) c).setHostnameVerifier((hostname, session) -> true);
             }
             Set<Map.Entry<String, String>> entrySet = headerMap.entrySet();
             for (Map.Entry<String, String> tempEntry : entrySet) {
@@ -158,12 +149,6 @@ public class SendLogDefaultRunnable extends SendLogRunnable {
                 }
                 data = back.toByteArray();
             }
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

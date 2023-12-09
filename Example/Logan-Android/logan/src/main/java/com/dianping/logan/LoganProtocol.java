@@ -54,8 +54,7 @@ class LoganProtocol implements LoganProtocolHandler {
     public void logan_write(int flag, String log, long local_time, String thread_name,
             long thread_id, boolean is_main) {
         if (mCurProtocol != null) {
-            mCurProtocol.logan_write(flag, log, local_time, thread_name, thread_id,
-                    is_main);
+            mCurProtocol.logan_write(flag, log, local_time, thread_name, thread_id, is_main);
         }
     }
 

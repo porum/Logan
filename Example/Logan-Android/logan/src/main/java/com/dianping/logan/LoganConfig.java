@@ -31,7 +31,7 @@ public class LoganConfig {
     private static final long DEFAULT_DAY = 7 * DAYS; //默认删除天数
     private static final long DEFAULT_FILE_SIZE = 10 * M;
     private static final long DEFAULT_MIN_SDCARD_SIZE = 50 * M; //最小的SD卡小于这个大小不写入
-    private static final int DEFAULT_QUEUE = 500;
+    private static final int DEFAULT_QUEUE = 10000;
 
     String mCachePath; //mmap缓存路径
     String mPathPath; //file文件路径
@@ -45,12 +45,10 @@ public class LoganConfig {
     byte[] mEncryptIv16; //128位aes加密IV
 
     boolean isValid() {
-        boolean valid = false;
-        if (!TextUtils.isEmpty(mCachePath) && !TextUtils.isEmpty(mPathPath) && mEncryptKey16 != null
-                && mEncryptIv16 != null) {
-            valid = true;
-        }
-        return valid;
+        return !TextUtils.isEmpty(mCachePath) && 
+            !TextUtils.isEmpty(mPathPath) &&
+            mEncryptKey16 != null &&
+            mEncryptIv16 != null;
     }
 
     private LoganConfig() {

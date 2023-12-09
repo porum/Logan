@@ -36,7 +36,7 @@ class CLoganProtocol implements LoganProtocolHandler {
     private boolean mIsLoganInit;
     private boolean mIsLoganOpen;
     private OnLoganProtocolStatus mLoganProtocolStatus;
-    private Set<Integer> mArraySet = Collections.synchronizedSet(new HashSet<Integer>());
+    private final Set<Integer> mArraySet = Collections.synchronizedSet(new HashSet<>());
 
     static {
         try {
@@ -166,8 +166,7 @@ class CLoganProtocol implements LoganProtocolHandler {
         }
         try {
             int isMain = is_main ? 1 : 0;
-            int code = clogan_write(flag, log, local_time, thread_name, thread_id,
-                    isMain);
+            int code = clogan_write(flag, log, local_time, thread_name, thread_id, isMain);
             if (code != ConstantCode.CloganStatus.CLOGAN_WRITE_SUCCESS || Logan.sDebug) {
                 loganStatusCode(ConstantCode.CloganStatus.CLOGAN_WRITE_STATUS, code);
             }
