@@ -211,13 +211,13 @@ clogan_init(const char *cache_dirs, const char *path_dirs, int max_file, const c
     size_t path3 = strlen(LOGAN_CACHE_FILE);
     size_t path4 = strlen(LOGAN_DIVIDE_SYMBOL);
 
-    int isAddDivede = 0;
+    int isAddDivide = 0;
     char d = *(cache_dirs + path1 - 1);
     if (d != '/') {
-        isAddDivede = 1;
+        isAddDivide = 1;
     }
 
-    size_t total = path1 + (isAddDivede ? path4 : 0) + path2 + path4 + path3 + 1;
+    size_t total = path1 + (isAddDivide ? path4 : 0) + path2 + path4 + path3 + 1;
     char *cache_path = malloc(total);
     if (NULL != cache_path) {
         _mmap_file_path = cache_path; //保持mmap文件路径,如果初始化失败,注意释放_mmap_file_path
@@ -230,7 +230,7 @@ clogan_init(const char *cache_dirs, const char *path_dirs, int max_file, const c
 
     memset(cache_path, 0, total);
     strcpy(cache_path, cache_dirs);
-    if (isAddDivede)
+    if (isAddDivide)
         strcat(cache_path, LOGAN_DIVIDE_SYMBOL);
 
     strcat(cache_path, LOGAN_CACHE_DIR);
@@ -242,12 +242,12 @@ clogan_init(const char *cache_dirs, const char *path_dirs, int max_file, const c
 
     size_t dirLength = strlen(path_dirs);
 
-    isAddDivede = 0;
+    isAddDivide = 0;
     d = *(path_dirs + dirLength - 1);
     if (d != '/') {
-        isAddDivede = 1;
+        isAddDivide = 1;
     }
-    total = dirLength + (isAddDivede ? path4 : 0) + 1;
+    total = dirLength + (isAddDivide ? path4 : 0) + 1;
 
     char *dirs = (char *) malloc(total); //缓存文件目录
 
@@ -261,7 +261,7 @@ clogan_init(const char *cache_dirs, const char *path_dirs, int max_file, const c
     }
     memset(dirs, 0, total);
     memcpy(dirs, path_dirs, dirLength);
-    if (isAddDivede)
+    if (isAddDivide)
         strcat(dirs, LOGAN_DIVIDE_SYMBOL);
     makedir_clogan(_dir_path); //创建缓存目录,如果初始化失败,注意释放_dir_path
 
