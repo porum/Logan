@@ -13,3 +13,5 @@ link_directories(clogan.out)
 
 add_library(logan SHARED src/main/jni/clogan_protocol.c)
 target_link_libraries(logan z clogan)
+
+target_link_options(logan PRIVATE "-Wl,-z,max-page-size=16384")
